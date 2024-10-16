@@ -66,8 +66,6 @@ class app(ShowBase):
             base.screen_quad.set_shader_input('hsv_g', 1.1)
             base.screen_quad.set_shader_input('hsv_b', 1.0)
 
-            text_1.set_text("Quality Mode: On")
-
         self.accept_once('m', quality_mode)
 
         def save_screen():
