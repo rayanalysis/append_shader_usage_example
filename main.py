@@ -49,9 +49,9 @@ class app(ShowBase):
         complexpbr.apply_shader(test_sphere_2)
         
         # call the append_shader() function
-        random_func = 'float default_noise(vec2 n)\n{\nfloat n2  = fract(sin(dot(n.xy,vec2(11.78,77.443)))*44372.7263);\nreturn n2;\n}'
-        custom_append_shader = random_func + '\n void main \n    o_color += default_noise(vec2(3.3));'
-        complexpbr.append_shader(custom_append_shader, test_sphere)
+        custom_body_mod = 'float default_noise(vec2 n)\n{\nfloat n2  = fract(sin(dot(n.xy,vec2(11.78,77.443)))*44372.7263);\nreturn n2;\n}'
+        custom_main_mod = 'o_color += default_noise(vec2(3.3));'
+        complexpbr.append_shader(test_sphere, custom_body_mod, custom_main_mod)
 
         def quality_mode():
             complexpbr.screenspace_init()
