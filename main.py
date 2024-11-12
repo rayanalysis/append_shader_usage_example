@@ -14,8 +14,6 @@ from direct.gui.DirectGui import *
 from panda3d.core import TextNode
 # new pbr imports
 import complexpbr
-# local imports
-import arena_lighting
 
 
 class app(ShowBase):
@@ -32,9 +30,6 @@ class app(ShowBase):
         # initialize the showbase
         super().__init__()
 
-        # lighting
-        arena_lighting.lighting()
-
         # load in the example model to use an appended shader on
         test_sphere = loader.load_model('1m_sphere_purple_metal.bam')
         test_sphere.reparent_to(self.render)
@@ -45,18 +40,21 @@ class app(ShowBase):
         test_sphere_2.set_pos(0,-1.1,0)
         
         # call apply_shader() first to init
-        complexpbr.apply_shader(test_sphere)
-        complexpbr.apply_shader(test_sphere_2)
+        complexpbr.apply_shader(test_sphere, custom_dir='shaders/', shadow_boost=0.75, default_lighting=True)
+        complexpbr.apply_shader(test_sphere_2, custom_dir='shaders/', shadow_boost=0.75)
+        # one must include ibl_v.vert, ibl_f.frag in base level program directory for sdist
         
         # call the append_shader() function
         custom_body_mod = 'float default_noise(vec2 n)\n{\nfloat n2  = fract(sin(dot(n.xy,vec2(11.78,77.443)))*44372.7263);\nreturn n2;\n}'
-        custom_main_mod = 'o_color += default_noise(vec2(3.3));'
-        complexpbr.append_shader(test_sphere, custom_body_mod, custom_main_mod)
+        custom_main_mod = 'o_color += default_noise(vec2(2.3,3.3));'
+        custom_vert_body_mod = 'float default_noise(vec2 n)\n{\nreturn n[0];\n}'
+        custom_vert_main_mod = 'float whatever = default_noise(vec2(2.3,3.3));'
+        complexpbr.append_shader(test_sphere, custom_body_mod, custom_main_mod, custom_vert_body_mod, custom_vert_main_mod)
 
         def quality_mode():
             complexpbr.screenspace_init()
         
-            base.screen_quad.set_shader_input("bloom_intensity", 0.5)
+            base.screen_quad.set_shader_input("bloom_intensity", 0.07)
             base.screen_quad.set_shader_input("bloom_threshold", 0.7)
             base.screen_quad.set_shader_input("bloom_blur_width", 10)
             base.screen_quad.set_shader_input("bloom_samples", 3)
@@ -86,13 +84,6 @@ class app(ShowBase):
 
         self.accept("f3", self.toggle_wireframe)
         self.accept("escape", sys.exit, [0])
-
-        def update(Task):
-            some_var = 0
-
-            return Task.cont
-            
-        self.task_mgr.add(update)
 
 
 app().run()
